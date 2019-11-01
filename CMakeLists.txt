@@ -18,56 +18,50 @@ HunterGate(
   SHA1 "e14bc153a7f16d6a5eeec845fb0283c8fad8c358"
 )
 
-project(PROJECTNAME)    # TODO
+project(AsioSyncClient)
 string(APPEND CMAKE_CXX_FLAGS " -pedantic -Werror -Wall -Wextra")
 string(APPEND CMAKE_CXX_FLAGS " -Wno-unused-command-line-argument")
 string(APPEND CMAKE_CXX_FLAGS " -Wshadow -Wnon-virtual-dtor")
 
-hunter_add_package(GTest)
-find_package(GTest CONFIG REQUIRED)
+hunter_add_package(Boost COMPONENTS filesystem log thread regex)
+find_package(Boost CONFIG REQUIRED filesystem log log_setup thread regex)
 find_package(Threads)
 
 add_library(
-  ${PROJECT_NAME}
+  ${PROJECT_NAME}Core
   STATIC
-  # TODO
+  ${CMAKE_CURRENT_SOURCE_DIR}/sources/core/Server.cpp
 )
 
 add_executable(
-  tests
-  # TODO
+  ${PROJECT_NAME}
+  ${CMAKE_CURRENT_SOURCE_DIR}/sources/main.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/sources/LogSetup.cpp
+)
+
+target_include_directories(
+  ${PROJECT_NAME}Core
+  PUBLIC
+  ${CMAKE_CURRENT_SOURCE_DIR}/include/core
 )
 
 target_include_directories(
   ${PROJECT_NAME}
   PUBLIC
   ${CMAKE_CURRENT_SOURCE_DIR}/include
-)
-
-target_include_directories(
-  tests
-  PUBLIC
-  ${CMAKE_CURRENT_SOURCE_DIR}/include
-  ${GTEST_ROOT}/include
 )
 
 target_link_libraries(
-  tests
+  ${PROJECT_NAME}Core
   ${CMAKE_THREAD_LIBS_INIT}
-  GTest::gtest
-  GTest::main
-  ${PROJECT_NAME}
+  Boost::log_setup
+  Boost::log
+  Boost::thread
+  Boost::filesystem
+  Boost::regex
 )
 
-enable_testing()
-add_test(NAME unit_tests COMMAND tests)
-
-if (BUILD_COVERAGE)
-  set(ENABLE_COVERAGE ON CACHE BOOL "Enable coverage build." FORCE)
-  list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
-  find_package(codecov)
-  add_coverage(${PROJECT_NAME})
-  add_coverage(tests)
-  list(APPEND LCOV_REMOVE_PATTERNS "'${PROJECT_SOURCE_DIR}/tests/*'")
-  coverage_evaluate()
-endif ()
+target_link_libraries(
+  ${PROJECT_NAME}
+  ${PROJECT_NAME}Core
+)
