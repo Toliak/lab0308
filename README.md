@@ -1,5 +1,20 @@
-[![Build Status](https://travis-ci.com/Toliak/lab0303.svg?branch=master)](https://travis-ci.com/Toliak/lab0304)
-![Code size](https://img.shields.io/github/languages/code-size/Toliak/lab0304.svg)
-![GitHub Repo size](https://img.shields.io/github/repo-size/Toliak/lab0304.svg)
-![Some badge](https://img.shields.io/badge/toliak-purple-purple.svg)
-![forthebadge](https://forthebadge.com/images/badges/mom-made-pizza-rolls.svg)
+[![Build Status](https://travis-ci.com/Toliak/lab0308.svg?branch=master)](https://travis-ci.com/Toliak/lab0308)
+[![coverage](https://gitlab.toliak.ru/bmstu-cpp-3-sem/lab0308/badges/master/pipeline.svg)](https://gitlab.toliak.ru/bmstu-cpp-3-sem/lab0308/pipelines)
+![Code size](https://img.shields.io/github/languages/code-size/Toliak/lab0308.svg)
+![GitHub Repo size](https://img.shields.io/github/repo-size/Toliak/lab0308.svg)
+
+# Лабораторная работа №8
+
+## Задание
+
+Использовать [Boost.Asio](https://www.boost.org/doc/libs/1_66_0/doc/html/boost_asio.html) для реализации клиента для сервера из Лабораторной работы №7.
+
+#### Требуется:
+Реализовать следующий функционал:
+- клиент заходит на сервер с именем пользователя (без пароля);
+- все соединения инициируются клиентом, где клиент запрашивает ответ от сервера;
+- запросы и ответы на них заканчиваются символом `'\n'`;
+- сервер отключает любого клиента, который не отвечает (не пингуется) в течение 5 секунд;
+- клиент может делать следующие запросы: получить список всех подключенных клиентов и пинговаться, где в ответе сервера будет либо `ping_ok`, либо `client_list_chaned` (в последнем случае клиент повторно запрашивает список подключенных клиентов);
+- каждый клиент проверяет связь с сервером в случайный момент времени (раз в 1-7 секунд, таким образом, время от времени соединение с сервером будет разрываться);
+- подробно взаимодействие между клиентом и сервером показано в лабораторной работе №7.
