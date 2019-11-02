@@ -2,46 +2,47 @@
 #include <boost/asio.hpp>
 
 #include "LogSetup.h"
+#include "core/Server.h"
+
+Server::Endpoint getEndpoint(char *host, char *port)
+{
+    Server::IoService ioService;
+
+    boost::asio::ip::tcp::resolver resolver(ioService);
+    boost::asio::ip::tcp::resolver::query query(host, port);
+
+    boost::asio::ip::tcp::resolver::iterator endpoint = resolver.resolve(query);
+    boost::asio::ip::tcp::resolver::iterator end;
+
+    if (endpoint == end) {
+        throw std::runtime_error{"Host and port cannot be resolved"};
+    }
+
+    return *endpoint;
+}
 
 int main(int argc, char *argv[])
 {
     LogSetup::init();
 
-    BOOST_LOG_TRIVIAL(info) << "Я программа";
+    BOOST_LOG_TRIVIAL(debug) << "Log setup complete";
 
-    if (argc != 2)
-    {
-        BOOST_LOG_TRIVIAL(error) << "Expected: client <host>";
+    if (argc != 3) {
+        BOOST_LOG_TRIVIAL(error) << "Expected: client <host> <port>";
         return 1;
     }
 
-    boost::asio::io_service io_service;
+    for (;;) {
+        BOOST_LOG_TRIVIAL(info) << "Client has been started";
 
-    boost::asio::ip::tcp::resolver resolver(io_service);
-    boost::asio::ip::tcp::resolver::query query(argv[1], "daytime");
-    boost::asio::ip::tcp::resolver::iterator endpoint_iterator = resolver.resolve(query);
-    boost::asio::ip::tcp::resolver::iterator end;
+        try {
+            static Server::Endpoint endpoint = getEndpoint(argv[1], argv[2]);
 
-    boost::asio::ip::tcp::socket socket(io_service);
+            Server server{endpoint};
+            server.act();
 
-    while (endpoint_iterator != end)
-    {
-        socket.close();
-        socket.connect(*endpoint_iterator++);
-    }
-
-    for (;;)
-    {
-        boost::array<char, 128> buf;
-        boost::system::error_code error;
-
-        size_t len = socket.read_some(boost::asio::buffer(buf), error);
-
-        if (error == boost::asio::error::eof)
-            break; // Connection closed cleanly by peer.
-        else if (error)
-            throw boost::system::system_error(error); // Some other error.
-
-        std::cout.write(buf.data(), len);
+        } catch (std::runtime_error &error) {
+            BOOST_LOG_TRIVIAL(error) << error.what();
+        }
     }
 }

@@ -30,6 +30,7 @@ find_package(Threads)
 add_library(
   ${PROJECT_NAME}Core
   STATIC
+  ${CMAKE_CURRENT_SOURCE_DIR}/sources/core/Utils.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/sources/core/Server.cpp
 )
 
